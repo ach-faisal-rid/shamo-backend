@@ -29,4 +29,15 @@ class AuthServiceProvider extends ServiceProvider
 
         //
     }
+
+    public function passwordRules()
+    {
+        return [
+            'required',
+            'string',
+            'min:8',
+            'confirmed',
+            'regex:/^.*(?=.{3,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[a-zA-Z0-9@$!%*?&].*$/',
+        ];
+    }
 }
