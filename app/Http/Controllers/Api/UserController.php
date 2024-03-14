@@ -21,8 +21,8 @@ class UserController extends Controller
 
             // validasi request
             $request->validate([
-                'name' => ['required', 'string', 'max:255', 'htmlspecialchars'],
-                'username' => ['required', 'string', 'max:255', 'unique:users', 'htmlspecialchars'],
+                'name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:users'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'phone' => ['nullable', 'string', 'max:255'],
                 'password' => 'required|string|min:8|regex:/^.*(?=.{3,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[a-zA-Z0-9@$!%*?&].*$/',
@@ -52,13 +52,6 @@ class UserController extends Controller
               'message' => 'Validasi gagal',
               'errors' => $e->errors(),
             ], 'Registrasi Gagal', 422);
-          } catch (Exception $e) {
-            // Catat error untuk debugging
-            Log::error($e);
-
-            return ResponseFormatter::error([
-              'message' => 'Terjadi kesalahan',
-            ], 'Registrasi Gagal', 500);
           }
     }
 }
