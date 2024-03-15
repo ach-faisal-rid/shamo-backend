@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
@@ -52,6 +53,50 @@ class UserController extends Controller
               'message' => 'Validasi gagal',
               'errors' => $e->errors(),
             ], 'Registrasi Gagal', 422);
-          }
+        }
+    }
+
+    public function login (Request $request) {
+        try {
+            // validasi request
+            $request->validate([
+                'email' => 'email|required',
+                'password' => 'required'
+            ]);
+
+            // Autentikasi Pengguna
+            $credentials = request(['email', 'password']);
+            // Melakukan autentikasi pengguna
+            if (!Auth::attempt($credentials)) {
+                return ResponseFormatter::error([
+                    'message' => 'unauthorized'
+                ], 'Authentication Failed', 500);
+            }
+
+            // Mengambil data pengguna dari database
+            $user = User::where('email', $request->email)->first();
+
+            if (!Hash::check($request->password, $user->password, [])) {
+                throw new Exception("Invalid Credentials");
+            }
+
+            // Membuat token akses untuk pengguna
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
+            // Mengembalikan response success dengan data
+            return ResponseFormatter::success([
+                'access_token' => $tokenResult,
+                'token_type' => 'Bearer',
+                'user' => $user
+            ], 'Authenticated');
+        }
+        // Penanganan Kesalahan
+        // Mengembalikan response error dengan pesan error
+        catch (ValidationException $e) {
+            // Menangani error validasi
+            return ResponseFormatter::error([
+              'message' => 'Validasi Gagal',
+              'errors' => $e->errors(),
+            ], 'Login Gagal', 422);
+        }
     }
 }

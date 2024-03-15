@@ -26,3 +26,4 @@ Route::get('products', [ProductController::class, 'all']);
 Route::get('categories', [ProductCategoryController::class, 'all']);
 
 Route::post('registrasi', [UserController::class, 'registrasi']);
+Route::post('login', [UserController::class, 'login']);
