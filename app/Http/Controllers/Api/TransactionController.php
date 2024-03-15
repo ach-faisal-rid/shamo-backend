@@ -33,7 +33,7 @@ class TransactionController extends Controller
             }
         }
         $transaction = transaction::with(['items.product'])
-        ->where('usersID', Auth::user()->id);
+        ->where('usersID', Auth::user());
 
         if ($status) {
             $transaction->where('status', $status);
