@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Http\Request;
 use App\Models\User;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -111,4 +112,10 @@ class UserController extends Controller
             ], 'Login Gagal', 401);
         }
     }
+
+    public function fetch (Request $request) {
+        return ResponseFormatter::success($request->user(),
+        'Data profile user berhasil diambil');
+    }
+
 }
