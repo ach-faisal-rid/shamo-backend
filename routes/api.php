@@ -26,5 +26,5 @@ Route::post('login', [UserController::class, 'login']);
 
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('profile', [UserController::class, 'fetch']);
-
+    Route::put('update-profile', [UserController::class, 'updateProfile']);
 });
