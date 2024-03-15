@@ -60,6 +60,11 @@ class UserController extends Controller
 
     public function login (Request $request) {
         try {
+
+            if(!$request->filled(['email', 'password'])) {
+                return response()->json(['message' => 'semua field harus diisi'], 422);
+            }
+
             // validasi request
             $request->validate([
                 'email' => 'email|required',
