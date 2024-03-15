@@ -24,7 +24,7 @@ Route::get('categories', [ProductCategoryController::class, 'all']);
 Route::post('registrasi', [UserController::class, 'registrasi']);
 Route::post('login', [UserController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('user', [UserController::class, 'fetch']);
-    
+Route::prefix('user')->middleware('auth:sanctum')->group(function () {
+    Route::get('profile', [UserController::class, 'fetch']);
+
 });
