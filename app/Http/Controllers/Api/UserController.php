@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
@@ -74,19 +75,25 @@ class UserController extends Controller
             }
 
             // Mengambil data pengguna dari database
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)
+            ->firstOrFail(); // only retrieve necessary user data
 
             if (!Hash::check($request->password, $user->password, [])) {
                 throw new Exception("Invalid Credentials");
             }
 
             // Membuat token akses untuk pengguna
-            $tokenResult = $user->createToken('authToken')->plainTextToken;
+            $tokenResult = $user->createToken('authToken', ['*'], now()->addMinutes(60))
+            ->plainTextToken; // set token expiration
             // Mengembalikan response success dengan data
             return ResponseFormatter::success([
                 'access_token' => $tokenResult,
                 'token_type' => 'Bearer',
-                'user' => $user
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    // include other relevant user information
+                ]
             ], 'Authenticated');
         }
         // Penanganan Kesalahan
@@ -97,6 +104,11 @@ class UserController extends Controller
               'message' => 'Validasi Gagal',
               'errors' => $e->errors(),
             ], 'Login Gagal', 422);
+        } catch (ModelNotFoundException $e) {
+            // Handle user not found scenario with specific error message
+            return ResponseFormatter::error([
+                'message' => 'Email tidak ditemukan.'
+            ], 'Login Gagal', 401);
         }
     }
 }
